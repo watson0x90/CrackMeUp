@@ -1,5 +1,11 @@
 # CrackMeUp
-Analyze passwords based upon multiple rules and wordlists
+## Overview
+It was created to fill a unique need to answer the question of how long it might take to crack passwords with certain wordlists and rule sets. With this information, you can suggest how a password policy might be improved and how to educate users on creating better passwords. The script will attempt to re-crack passwords when it uses a wordlist and ruleset. When the script finishes, a `.csv` file will be created with information gahtered during the password cracking process with hashcat.
+
+## Requirements
+1. Hashcat installed and in your PATH
+2. Python3
+3. Install requirements.txt
 
 ## Usage
 ```
@@ -13,3 +19,11 @@ Analyze passwords based upon multiple rules and wordlists
 ```bash
 python3 crackmeup.py -m 1000 -d /opt/tools/hashcat-files/hashes/2023PWAudit -f 20231028-ad-int-hashes.txt -p ad_name-ntlm
 ```
+
+## Output files
+While cracking passwords, multiple files will be created such as:
+  - `.log` files for keeping track of hashcat sessions
+  - `.pot` files for cracked passwords for each wordlist and ruleset used
+  - `.csv` file that will output a full analysis of cracked password based upon each wordlist and ruleset used
+
+It is important to note that you must run the example command above in a **screen** session if you are working over SSH to your password-cracking rig. You will also need to let the password cracking run its course because there is only a recovery or option to analyze passwords after first working through cracking.
