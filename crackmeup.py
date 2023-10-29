@@ -11,10 +11,12 @@ import warnings
 import numpy as np
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-
+# Change the rules_path and wordlist_path to match the locations 
+# of your paths
 rules_path = "/home/colonelsanders/hashcat-files/rules/"
 wordlist_path = "/home/colonelsanders/hashcat-files/wordlists/"
 
+# Update the rule files you will use
 rule_files = [
     "best64.rule",
     "hob064.rule",
@@ -27,6 +29,7 @@ rule_files = [
 
 ]
 
+#Update the wordlist files you will use
 wordlist_files = [
     "rockyou.txt",
     "InsideProFull",
@@ -40,6 +43,8 @@ pot_file_list = []
 
 def create_csv_all_data(analyzeFile, outFile):
 
+    # The regex below was taken from another password analysis script. I do not remember which one. I have been using this code
+    # for several years now and need to credit who created it.
     complexityTable = {
         'complexity': ['loweralpha', 'upperalpha', 'numeric', 'special', 'loweralphanum', 'upperalphanum', 'mixedalpha',
                        'loweralphaspecial', 'upperalphaspecial', 'specialnum', 'mixedalphanum', 'loweralphaspecialnum',
@@ -131,7 +136,8 @@ def main(argv):
             pot_file = arg
         elif opt in ("-f", "--hash_file"):
             hash_file = arg
-
+    # The regex below was taken from another password analysis script. I do not remember which one. I have been using this code
+    # for several years now and need to credit who created it.
     complexityTable = {
         'complexity': ['loweralpha', 'upperalpha', 'numeric', 'special', 'loweralphanum', 'upperalphanum', 'mixedalpha',
                        'loweralphaspecial', 'upperalphaspecial', 'specialnum', 'mixedalphanum', 'loweralphaspecialnum',
