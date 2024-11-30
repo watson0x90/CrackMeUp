@@ -16,8 +16,12 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 rules_path = "/home/colonelsanders/hashcat-files/rules/"
 wordlist_path = "/home/colonelsanders/hashcat-files/wordlists/"
 
+
+global all
+all = False
+
 # Update the rule files you will use
-rule_files = [
+rule_files2 = [
     "best64.rule",
     "hob064.rule",
     "d3ad0ne.rule",
@@ -101,7 +105,24 @@ def build_hc_command(wordlist_file, rule, mode_num, pot_file, hash_dir, hash_fil
     hash_loc = hash_dir + "/" + hash_file
     hc_cmd = f'hashcat {hash_loc} -m {mode_num} --potfile-path={pot_loc} -r {rules_path+rule} {wordlist_path+wordlist_file}'
 
-    pot_file_list.append(pot_loc)
+    if pot_loc not in pot_file_list:
+        pot_file_list.append(pot_loc)
+
+    lwfile = re.sub('\.txt', '', wordlist_file)
+    lrule = re.sub('\.rule', '', rule)
+    tempLogName = f'{lwfile}-{lrule}'
+    log_name = "hashcat-" + tempLogName + "-" + now.strftime("%Y-%m-%d-%H-%M-%S") + ".log"
+
+    return log_name, hc_cmd
+
+def build_hc_command_single_pass(wordlist_file, rule, mode_num, pot_file, hash_dir, hash_file):
+    now = datetime.datetime.now()
+    pot_loc = hash_dir + "/" + pot_file + ".pot"
+    hash_loc = hash_dir + "/" + hash_file
+    hc_cmd = f'hashcat {hash_loc} -m {mode_num} --potfile-path={pot_loc} -r {rules_path+rule} {wordlist_path+wordlist_file}'
+
+    if pot_loc not in pot_file_list:
+        pot_file_list.append(pot_loc)
 
     lwfile = re.sub('\.txt', '', wordlist_file)
     lrule = re.sub('\.rule', '', rule)
@@ -119,15 +140,19 @@ def unique(list1):
     return np.unique(x)
 
 def main(argv):
+    global all
+    all = False
     try:
-        opts, args = getopt.getopt(argv, "h:m:d:p:f:", ["mode=", "hash_dir=", "pot=", "hash_file="])
+        opts, args = getopt.getopt(argv, "h:a:m:d:p:f:", ["all", "mode=", "hash_dir=", "pot=", "hash_file="])
     except getopt.GetoptError:
-        print('hashcat-proj.py -m <mode> -d <hash_dir> -p <pot> -f <hash_file>')
+        print('crackmeup.py -a <retry all against wordlist & rules> -m <mode> -d <hash_dir> -p <pot> -f <hash_file>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('hashcat.py -m <mode> -d <hash_dir>')
+            print('crackmeup.py -a <retry all against wordlist & rules> -m <mode> -d <hash_dir> -p <pot> -f <hash_file>')
             sys.exit()
+        elif opt in ("-a", "--all"):
+            all = True
         elif opt in ("-m", "--mode"):
             hc_mode = arg
         elif opt in ("-d", "--hash_dir"):
@@ -164,7 +189,10 @@ def main(argv):
 
             resTable = pd.DataFrame(resultsTable)
 
-            logfile_name, hc_cmd = build_hc_command(wordlist_file, rule, hc_mode, pot_file, hash_dir, hash_file)
+            if all:
+                logfile_name, hc_cmd = build_hc_command(wordlist_file, rule, hc_mode, pot_file, hash_dir, hash_file)
+            else:
+                logfile_name, hc_cmd = build_hc_command_single_pass(wordlist_file, rule, hc_mode, pot_file, hash_dir, hash_file)
 
             hc_split = hc_cmd.split(" ", 8)
             logfile = hash_dir + "/" + logfile_name
